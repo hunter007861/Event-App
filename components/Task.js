@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Touchable, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 const Task = ({ text }) => {
     return (
@@ -25,7 +25,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: "center",
         justifyContent: "space-between",
-        marginBottom: 15
+        marginBottom: 15,
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5
     },
     itemLeft: {
         flexDirection: "row",
