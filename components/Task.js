@@ -1,14 +1,15 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-
-const Task = ({ text }) => {
+import moment from "moment/moment";
+const Task = ({ event }) => {
     return (
         <View style={styles.item}>
             <View style={styles.itemLeft}>
-                <TouchableOpacity style={styles.square}></TouchableOpacity>
+                {/* <TouchableOpacity style={styles.square}></TouchableOpacity> */}
                 <View style={styles.itemTextContainer}>
-                    <Text style={styles.eventTitle}>{text}</Text>
-                    <Text style={styles.eventDescription}>{text}</Text>
+                    <Text style={styles.eventTitle}>{event?.eventName}</Text>
+                    <Text style={styles.eventDescription}>{event?.eventDescription}</Text>
+                    <Text>{moment(event?.date).format("ddd, MMM Do YYYY, h:mm:ss a")}</Text>
                 </View>
             </View>
             <View style={styles.circular}>

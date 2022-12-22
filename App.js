@@ -4,16 +4,25 @@ import Task from './components/Task';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 export default function App() {
-  const [task, setTask] = useState();
-  const [taskItems, setTaskItems] = useState(["Event 1"]);
+  const [task, setTask] = useState({});
+  const [taskItems, setTaskItems] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [date, setDate] = useState(new Date());
 
   const addTask = () => {
-    setTaskItems([...taskItems, task])
-    setTask("")
+    setTaskItems([...taskItems, {...task,date:date}])
+    setTask({})
     Keyboard.dismiss();
+    setModalVisible(!modalVisible)
   }
+
+  const onInputChange = (e, name) => {
+    const val = (e) || '';
+    let _task = {...task};
+    _task[`${name}`] = val;
+    setTask(_task);
+};
+
   return (
     <View style={styles.container}>
       <View style={styles.taskWrapper}>
@@ -21,7 +30,7 @@ export default function App() {
         <ScrollView style={styles.item}>
           {
             taskItems.map((item, index) => {
-              return (<Task key={index} text={item} />)
+              return (<Task key={index} event={item} />)
             })
           }
         </ScrollView>
@@ -47,13 +56,13 @@ export default function App() {
               behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
               style={styles.writeTextWrapper}
             >
-              <TextInput style={styles.input} placeholder={'Event Name'} onChangeText={e => setTask(e)} />
-              <TextInput style={styles.inputArea} placeholder={'Event Description'} numberOfLines={10} onChangeText={e => setTask(e)} />
-              <DateTimePicker mode="datetime" display='spinner' value={new Date()} />
+              <TextInput style={styles.input} placeholder={'Event Name'} onChangeText={e => onInputChange(e,"eventName")} />
+              <TextInput style={styles.inputArea} placeholder={'Event Description'} numberOfLines={10} onChangeText={e => onInputChange(e,"eventDescription")} />
+              <DateTimePicker mode="datetime" display='spinner' value={date} onChange={(e,v)=> setDate(v)}/>
               <View style={styles.modalButtonContainer}>
                 <Pressable
                   style={[styles.button, styles.buttonClose]}
-                  onPress={() => setModalVisible(!modalVisible)}
+                  onPress={() => addTask()}
                 >
                   <Text style={styles.textStyle}>Add</Text>
                 </Pressable>
@@ -88,7 +97,19 @@ const styles = StyleSheet.create({
   },
   item: {
     marginTop: 25,
-    maxHeight: "85%"
+    height: "78%",
+    padding:10,
+    borderColor:"#000",
+    borderWidth:1,
+    borderRadius:20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
   },
   AddWrapper: {
     position: 'absolute',
