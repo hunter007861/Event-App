@@ -1,20 +1,18 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Pressable } from "react-native";
 import moment from "moment/moment";
-const Task = ({ event }) => {
+const Task = ({ event,deleteTask}) => {
     return (
         <View style={styles.item}>
             <View style={styles.itemLeft}>
                 {/* <TouchableOpacity style={styles.square}></TouchableOpacity> */}
                 <View style={styles.itemTextContainer}>
                     <Text style={styles.eventTitle}>{event?.eventName}</Text>
-                    <Text style={styles.eventDescription}>{event?.eventDescription}</Text>
-                    <Text>{moment(event?.date).format("ddd, MMM Do YYYY, h:mm:ss a")}</Text>
+                    <Text style={styles.eventDescription}>{event?.eventDescription}{"\n"}</Text>
+                    <Text style={styles.date}>{moment(event?.date).format("ddd, MMM Do YYYY, h:mm a")}</Text>
                 </View>
             </View>
-            <View style={styles.circular}>
-
-            </View>
+            <Pressable style={styles.circular} onPress={()=>{deleteTask(event.eventName)}} />
         </View>
     )
 }
@@ -50,7 +48,7 @@ const styles = StyleSheet.create({
         marginRight: 15
     },
     itemTextContainer: {
-        maxWidth: '80%'
+        width: '90%'
 
     },
     circular: {
@@ -63,6 +61,10 @@ const styles = StyleSheet.create({
     eventTitle:{
         fontWeight:"bold",
         fontSize:17
+    },
+    date:{
+        fontSize:12,
+        color:'grey'
     }
 })
 export default Task;

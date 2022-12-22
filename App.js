@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert, Keyboard, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Task from './components/Task';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function App() {
   const [task, setTask] = useState({});
@@ -9,19 +10,42 @@ export default function App() {
   const [modalVisible, setModalVisible] = useState(false);
   const [date, setDate] = useState(new Date());
 
-  const addTask = () => {
-    setTaskItems([...taskItems, {...task,date:date}])
-    setTask({})
-    Keyboard.dismiss();
-    setModalVisible(!modalVisible)
+  useEffect(() => {
+    AsyncStorage.getItem("storedData").then(data => {
+      if (data !== null) {
+        setTaskItems(JSON.parse(data))
+      }
+    }).catch((e) => {
+      console.log(e)
+    })
+  }, [])
+
+  const addTask = async() => {
+    await AsyncStorage.setItem('storedData',JSON.stringify([...taskItems, { ...task, date: date }])).then(() => {
+      setTaskItems([...taskItems, { ...task, date: date }])
+      setTask({})
+      setDate(new Date())
+      Keyboard.dismiss();
+      setModalVisible(!modalVisible)
+    }).catch((e) => {
+      console.log(e)
+    })
   }
+
+  const deleteTask = async (id) => {
+    let _tasks = taskItems.filter((val) => val.eventName !== id);
+    console.log(id)
+    await AsyncStorage.setItem('storedData',JSON.stringify(_tasks)).then(() => {
+      setTaskItems(_tasks);
+    })
+};
 
   const onInputChange = (e, name) => {
     const val = (e) || '';
-    let _task = {...task};
+    let _task = { ...task };
     _task[`${name}`] = val;
     setTask(_task);
-};
+  };
 
   return (
     <View style={styles.container}>
@@ -30,7 +54,7 @@ export default function App() {
         <ScrollView style={styles.item}>
           {
             taskItems.map((item, index) => {
-              return (<Task key={index} event={item} />)
+              return (<Task key={index} event={item} deleteTask={deleteTask}/>)
             })
           }
         </ScrollView>
@@ -56,9 +80,9 @@ export default function App() {
               behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
               style={styles.writeTextWrapper}
             >
-              <TextInput style={styles.input} placeholder={'Event Name'} onChangeText={e => onInputChange(e,"eventName")} />
-              <TextInput style={styles.inputArea} placeholder={'Event Description'} numberOfLines={10} onChangeText={e => onInputChange(e,"eventDescription")} />
-              <DateTimePicker mode="datetime" display='spinner' value={date} onChange={(e,v)=> setDate(v)}/>
+              <TextInput style={styles.input} placeholder={'Event Name'} onChangeText={e => onInputChange(e, "eventName")} />
+              <TextInput style={styles.inputArea} placeholder={'Event Description'} numberOfLines={10} onChangeText={e => onInputChange(e, "eventDescription")} />
+              <DateTimePicker mode="datetime" display='spinner' value={date} onChange={(e, v) => setDate(v)} />
               <View style={styles.modalButtonContainer}>
                 <Pressable
                   style={[styles.button, styles.buttonClose]}
@@ -98,10 +122,10 @@ const styles = StyleSheet.create({
   item: {
     marginTop: 25,
     height: "78%",
-    padding:10,
-    borderColor:"#000",
-    borderWidth:1,
-    borderRadius:20,
+    padding: 10,
+    borderColor: "#000",
+    borderWidth: 1,
+    borderRadius: 20,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -184,8 +208,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 10,
     elevation: 2,
-    width:150,
-    margin:5,
+    width: 150,
+    margin: 5,
   },
   buttonOpen: {
     backgroundColor: "#000",
@@ -204,9 +228,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 25
   },
-  modalButtonContainer:{
-    flexDirection:"row",
-    justifyContent:'center',
-    alignItems:'center'
+  modalButtonContainer: {
+    flexDirection: "row",
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 });
