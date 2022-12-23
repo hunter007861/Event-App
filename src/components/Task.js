@@ -1,6 +1,8 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Pressable } from "react-native";
 import moment from "moment/moment";
+import MaterialIcon from '@expo/vector-icons/MaterialIcons';
+
 const Task = ({ event,deleteTask}) => {
     return (
         <View style={styles.item}>
@@ -12,7 +14,9 @@ const Task = ({ event,deleteTask}) => {
                     <Text style={styles.date}>{moment(event?.date).format("ddd, MMM Do YYYY, h:mm a")}</Text>
                 </View>
             </View>
-            <Pressable style={styles.circular} onPress={()=>{deleteTask(event.eventName)}} />
+            <Pressable style={styles.Delete} onPress={()=>{deleteTask(event.eventName)}} >
+                <MaterialIcon name="delete" size={20}/>
+                </Pressable>
         </View>
     )
 }
@@ -51,12 +55,9 @@ const styles = StyleSheet.create({
         width: '90%'
 
     },
-    circular: {
-        width: 12,
-        height: 12,
-        borderColor: '#55bcf6',
-        borderWidth: 2,
-        borderRadius: 5
+    Delete: {
+        width: 20,
+        height: 20
     },
     eventTitle:{
         fontWeight:"bold",
