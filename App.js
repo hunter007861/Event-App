@@ -6,6 +6,7 @@ import QRScreen from './src/screens/QRScreen';
 import Icon from 'react-native-vector-icons/Ionicons';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
+import * as Linking from 'expo-linking';
 import { useEffect, useRef, useState } from 'react';
 
 Notifications.setNotificationHandler({
@@ -16,16 +17,30 @@ Notifications.setNotificationHandler({
   }),
 });
 
+const prefix = Linking.createURL('/')
 
 export default function App() {
 
   const Tab = createBottomTabNavigator();
-
+  const linking = {
+    prefixes : [prefix],
+    config:{
+      screens:{
+        Home:{
+          path:"Home"
+        },
+        QRScreen:{
+          path:"QRScreen"
+        }
+      }
+    }
+  }
   const [expoPushToken, setExpoPushToken] = useState('');
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
 
+  
   useEffect(() => {
     registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
 
@@ -42,9 +57,10 @@ export default function App() {
       Notifications.removeNotificationSubscription(responseListener.current);
     };
   }, []);
+
   return (
     <View style={styles.container}>
-      <NavigationContainer>
+      <NavigationContainer linking={linking}>
         <Tab.Navigator screenOptions={({ route }) => ({
           headerShown: false,
           tabBarActiveTintColor: "#000",
@@ -60,7 +76,7 @@ export default function App() {
           }
         })}>
           <Tab.Screen name="Home" component={HomeScreen} />
-          <Tab.Screen name="QR Screen" component={QRScreen} />
+          <Tab.Screen name="QRScreen" component={QRScreen} />
         </Tab.Navigator>
       </NavigationContainer>
     </View>

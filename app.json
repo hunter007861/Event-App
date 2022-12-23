@@ -3,6 +3,7 @@
     "name": "my-app",
     "slug": "my-app",
     "version": "1.0.0",
+    "scheme": "everem",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -17,7 +18,9 @@
         {
           "icon": "./assets/icon.png",
           "color": "#ffffff",
-          "sounds": ["./assets/notification.wav"]
+          "sounds": [
+            "./assets/notification.wav"
+          ]
         }
       ]
     ],
@@ -28,16 +31,23 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.sarvesh123.myapp"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.sarvesh123.myapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "7584382a-f839-460c-9f9a-f3abd454a998"
+      }
     }
   }
 }
