@@ -30,13 +30,25 @@ const HomeScreen = () => {
     });
   }
 
-  const handleDeepLink = (event) => {
+  const handleDeepLink = async (event) => {
     let _data = Linking.parse(event.url);
     setData(_data)
     console.log(_data)
-    if (_data.path === "Home") {
+    let _date = new Date(_data.queryParams.date)
+    console.log("date is " + _date);
+    await AsyncStorage.getItem("storedData").then(async data => {
+      if (data !== null) {
+        setTaskItems(JSON.parse(data))
+      }
+      if (_data.path === "Home") {
 
-    }
+        await AsyncStorage.setItem('storedData', JSON.stringify([...JSON.parse(data), { eventName: _data.queryParams.eventName, eventDescription: _data.queryParams.eventDescription, date: _date }])).then(() => {
+          let task = { eventName: _data.queryParams.eventName, eventDescription: _data.queryParams.eventDescription }
+          schedulePushNotification({ task, _date });
+          setTaskItems([...JSON.parse(data), { eventName: _data.queryParams.eventName, eventDescription: _data.queryParams.eventDescription, date: _date }])
+        })
+      }
+    })
   }
 
 
