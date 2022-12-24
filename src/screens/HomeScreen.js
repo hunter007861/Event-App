@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import AddModal from '../components/AddModal';
 import * as Linking from 'expo-linking';
+import moment from 'moment';
 
 const HomeScreen = () => {
   const [task, setTask] = useState({});
@@ -29,41 +30,49 @@ const HomeScreen = () => {
     });
   }
 
-  const handleDeepLink = (event)=>{
+  const handleDeepLink = (event) => {
     let _data = Linking.parse(event.url);
     setData(_data)
     console.log(_data)
+    if (_data.path === "Home") {
+
+    }
   }
-
-  useEffect(()=>{
-
-    async function getInitialURL(){
-      const initialURL =  await Linking.getInitialURL();
-      if(initialURL){
-        setData(Linking.parse(initialURL));
-        console.log(Linking.parse(initialURL))
-      } 
-    }
-
-    const subscription = Linking.addEventListener("url", handleDeepLink);
-    if(!data){
-      getInitialURL();
-    }
-    return(()=>{
-      subscription.remove();
-    })
-  },[]);
 
 
   useEffect(() => {
-    AsyncStorage.getItem("storedData").then(data => {
-      if (data !== null) {
-        setTaskItems(JSON.parse(data))
+
+    async function getInitialURL() {
+      const initialURL = await Linking.getInitialURL();
+      if (initialURL) {
+        let _data = Linking.parse(initialURL)
+        setData(_data);
+        let _date = moment(_data.queryParams.date)
+        console.log("date is " + _data.queryParams.date);
+        await AsyncStorage.getItem("storedData").then(async data => {
+          if (data !== null) {
+            setTaskItems(JSON.parse(data))
+          }
+          if (_data.path === "Home") {
+
+            await AsyncStorage.setItem('storedData', JSON.stringify([...JSON.parse(data), { eventName: _data.queryParams.eventName, eventDescription: _data.queryParams.eventDescription, date: _data.queryParams.date }])).then(() => {
+              let task = { eventName: _data.queryParams.eventName, eventDescription: _data.queryParams.eventDescription }
+              schedulePushNotification({ task, _date });
+              setTaskItems([...JSON.parse(data), { eventName: _data.queryParams.eventName, eventDescription: _data.queryParams.eventDescription, date: _date }])
+            })
+          }
+        })
       }
-    }).catch((e) => {
-      console.log(e)
+    }
+
+    const subscription = Linking.addEventListener("url", handleDeepLink);
+    if (!data) {
+      getInitialURL();
+    }
+    return (() => {
+      subscription.remove();
     })
-  }, [])
+  }, []);
 
   const addTask = async () => {
     await AsyncStorage.setItem('storedData', JSON.stringify([...taskItems, { ...task, date: date }])).then(() => {
@@ -72,7 +81,7 @@ const HomeScreen = () => {
       setTask({})
       setDate(new Date())
       Keyboard.dismiss();
-      setModalVisible(!modalVisible)
+      setModalVisible(false)
     }).catch((e) => {
       console.log(e)
     })
@@ -108,7 +117,7 @@ const HomeScreen = () => {
           <Text style={styles.textStyle}>Add New Event</Text>
         </View>
       </TouchableOpacity>
-      <AddModal setModalVisible={setModalVisible} modalVisible={modalVisible} onInputChange={onInputChange} addTask={addTask} date={date} setDate={setDate}/>
+      <AddModal setModalVisible={setModalVisible} modalVisible={modalVisible} onInputChange={onInputChange} addTask={addTask} date={date} setDate={setDate} />
     </View>
 
   )
