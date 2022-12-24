@@ -1,3 +1,4 @@
+import moment from 'moment';
 import React, { useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import QRCode from 'react-native-qrcode-svg'
@@ -15,14 +16,16 @@ const QRScreen = () => {
   };
 
   const addTask = async () => {
-    setTask({...task,date:date});
+    let _date = date.toISOString()
+    console.log(_date)
+    setTask({...task,date:_date});
     setModalVisible(!modalVisible)
   }
 
   return (
     <View style={styles.QRScreenWrapper}>
        <View style={styles.QRScreen}>
-           {task === null ? null: <QRCode size={250} value={`exp://192.168.0.116:19000/--/Home?eventName=${task.eventName}&eventDescription=${task.eventDescription}&date=${JSON.stringify(task.date)}`}/>}
+           {task === null ? null: <QRCode size={250} value={`exp://192.168.0.116:19000/--/Home?eventName=${task.eventName}&eventDescription=${task.eventDescription}&date=${task.date}`}/>}
        </View>
        <TouchableOpacity style={styles.AddWrapper} onPress={() => setModalVisible(!modalVisible)}>
         <View style={styles.addText}>
